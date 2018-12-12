@@ -1,4 +1,4 @@
-const position = {};
+const position = { latitude: 24.215, longitude: 120.614 };
 let map;
 const busStopUrl = './Bus/Stop';
 const estimatedUrl = './Bus/EstimatedTimeOfArrival';
@@ -8,33 +8,44 @@ let busStopEstimateTimeData;
 let routeNameData;
 
 // 獲取目前定位、初始化Google Maps，並獲取附近公車站牌
-function getBusGeolocation() {
-    navigator.geolocation.getCurrentPosition(function (pos) {
-        position.latitude = pos.coords.latitude;
-        position.longitude = pos.coords.longitude;
-        console.log(position);
-        initMap();
-        getNearbyBusStop();
-    });
-}
+// function getBusGeolocation() {
+//     navigator.geolocation.getCurrentPosition(function (pos) {
+//         position.latitude = pos.coords.latitude;
+//         position.longitude = pos.coords.longitude;
+//         console.log(position);
+//         initMap();
+//         getNearbyBusStop();
+//     });
+// }
 
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: position.latitude, lng: position.longitude },
         zoom: 15
     });
+    map.addListener('click', function (e) {
+        getUserGeolocation(e.latLng, map);
+    });
+}
+
+function getUserGeolocation(latLng, map) {
     let marker = new google.maps.Marker({
-        position: { lat: position.latitude, lng: position.longitude },
+        position: latLng,
         map: map,
         label: '你的位置'
     });
+    map.panTo(latLng);
+    google.maps.event.clearListeners(map, 'click');
+    position.latitude = latLng.lat();
+    position.longitude = latLng.lng();
+    getNearbyBusStop();
 }
 
 function getNearbyBusStop() {
     if (position === null) return;
 
     let distance = 1000;
-    let data = { query: `$spatialFilter=nearby(StopPosition,${position.latitude},${position.longitude},${distance})`};
+    let data = { query: `$spatialFilter=nearby(StopPosition,${position.latitude},${position.longitude},${distance})` };
     $.ajax({
         type: 'POST',
         url: busStopUrl,
@@ -72,7 +83,7 @@ function addBusMarker() {
 }
 
 $('#btnGeolocation').click(function () {
-    getBusGeolocation();
+    initMap();
 });
 
 function getBusStopData(busStops) {
@@ -80,7 +91,7 @@ function getBusStopData(busStops) {
     for (let index = 0; index < busStops.length; index++) {
         if (busStops.length === 1 || index === 0) {
             queryString += `StopUID eq '${busStops[index].StopUID}'`;
-        }else{
+        } else {
             queryString += ` or StopUID eq '${busStops[index].StopUID}'`;
         }
     }
@@ -105,15 +116,15 @@ function getRouteNameData(busStopTime) {
     for (let index = 0; index < busStopTime.length; index++) {
         if (busStopTime.length === 1 || index === 0) {
             queryString += `RouteUID eq '${busStopTime[index].RouteUID}'`;
-        }else{
+        } else {
             queryString += ` or RouteUID eq '${busStopTime[index].RouteUID}'`;
         }
     }
 
-    let data = { query: `$filter=${queryString}`};
+    let data = { query: `$filter=${queryString}` };
     $.ajax({
         type: 'POST',
-        url: `routeUrl`,
+        url: routeUrl,
         data: data,
         dataType: 'json',
         success: function (data) {
