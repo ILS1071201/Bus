@@ -1,11 +1,13 @@
-const baseUrl = 'https://ptx.transportdata.tw/MOTC/v2/Bus/Route/City/Taichung';
+const baseUrl = './Bus/Route';
 let busRouteData;
 
 //取回所有的busRouteData(靜態資料)
 $(function () {
+    let data = { query: '' };
     $.ajax({
-        type: 'GET',
+        type: 'POST',
         url: baseUrl,
+        data: data,
         dataType: 'json',
         success: function (data) {
             busRouteData = data;
@@ -20,7 +22,7 @@ function showBusRoute(data) {
     let busRouteList = '';
     for (const item of data) {
         busRouteList +=
-            `<a class="list-group-item list-group-item-action" href="busRouteInfo.html?RouteUID=${item.RouteUID}">
+            `<a class="list-group-item list-group-item-action" href="./busRouteInfo.html?RouteUID=${item.RouteUID}">
                 <h3>${item.SubRoutes[0].SubRouteName.Zh_tw}</h3>
                 <p>${item.SubRoutes[0].Headsign}</p>
             </a>`;
@@ -33,22 +35,22 @@ $('#busSearch').keyup(function () {
     const searchValue = $('#busSearch').val();
     // console.log(searchValue);
     searchBusRoute(searchValue);
-})
+});
 
 //監聽搜尋按鈕
 $('#btnBusSearch').click(function () {
     const searchValue = $('#busSearch').val();
     // console.log(searchValue);
     searchBusRoute(searchValue);
-})
+});
 
 //搜尋資料
 function searchBusRoute(searchValue) {
     if (busRouteData === null) return;
     let tempData = busRouteData.filter(function (item) {
         return item.SubRoutes[0].SubRouteName.Zh_tw.indexOf(searchValue) >= 0
-        || item.SubRoutes[0].Headsign.indexOf(searchValue) >= 0;
-    })
+            || item.SubRoutes[0].Headsign.indexOf(searchValue) >= 0;
+    });
     // console.log(tempData);
     return showBusRoute(tempData);
 }

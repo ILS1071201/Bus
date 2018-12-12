@@ -42,7 +42,7 @@ namespace Bus.Controllers
             string xdate = DateTime.Now.ToUniversalTime().ToString("r");
             string sAuth = HMAC_SHA1.GetAuth(xdate);
 
-            List<Route> Data = new List<Route>();
+            List<EstimatedTimeOfArrival> Data = new List<EstimatedTimeOfArrival>();
 
             var APIUrl = $"https://ptx.transportdata.tw/MOTC/v2/Bus/EstimatedTimeOfArrival/City/Taichung?{query}";
             string Result = string.Empty;
@@ -53,7 +53,7 @@ namespace Bus.Controllers
                 Result = Client.GetStringAsync(APIUrl).Result;
             }
 
-            Data = JsonConvert.DeserializeObject<List<Route>>(Result);
+            Data = JsonConvert.DeserializeObject<List<EstimatedTimeOfArrival>>(Result);
             return Json(Data);
         }
 
@@ -64,7 +64,7 @@ namespace Bus.Controllers
             string xdate = DateTime.Now.ToUniversalTime().ToString("r");
             string sAuth = HMAC_SHA1.GetAuth(xdate);
 
-            List<Route> Data = new List<Route>();
+            List<Stop> Data = new List<Stop>();
 
             var APIUrl = $"https://ptx.transportdata.tw/MOTC/v2/Bus/Stop/City/Taichung?{query}";
             string Result = string.Empty;
@@ -75,7 +75,7 @@ namespace Bus.Controllers
                 Result = Client.GetStringAsync(APIUrl).Result;
             }
 
-            Data = JsonConvert.DeserializeObject<List<Route>>(Result);
+            Data = JsonConvert.DeserializeObject<List<Stop>>(Result);
             return Json(Data);
         }
     }

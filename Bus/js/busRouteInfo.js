@@ -1,5 +1,5 @@
-const estimatedUrl = 'https://ptx.transportdata.tw/MOTC/v2/Bus/EstimatedTimeOfArrival/City/Taichung';
-const routeUrl = 'https://ptx.transportdata.tw/MOTC/v2/Bus/Route/City/Taichung';
+const estimatedUrl = './Bus/EstimatedTimeOfArrival';
+const routeUrl = './Bus/Route';
 const url = new URL(window.location.href);
 const params = url.searchParams;
 console.log(params.get('RouteUID'));
@@ -11,7 +11,7 @@ const direction = {
     setDirection(direction) {
         this.now = direction;
     }
-}
+};
 let time = 0;
 const refreshTime = 60;
 let busEstimateTimeData;
@@ -21,15 +21,17 @@ $(getRouteData());
 $(getBusEstimateTimeData());
 $(setInterval(function () {
     time += 1;
-    if (time >= refreshTime) { getBusEstimateTimeData() };
+    if (time >= refreshTime) { getBusEstimateTimeData(); }
     $('#time').text(`於${time}秒前更新`);
 }, 1000));
 
 // 取得該路線的資訊
 function getRouteData() {
+    let data = { query: `$filter=RouteUID eq '${params.get('RouteUID')}'` };
     $.ajax({
-        type: 'GET',
-        url: `${routeUrl}?$filter=RouteUID eq '${params.get('RouteUID')}'`,
+        type: 'POST',
+        url: routeUrl,
+        data: data,
         dataType: 'json',
         success: function (data) {
             $('#busRoute').text(data[0].RouteName.Zh_tw);
@@ -37,14 +39,16 @@ function getRouteData() {
             $('#btnBack').text(`往 ${data[0].DepartureStopNameZh}`);
             console.log(data[0].RouteName.Zh_tw);
         }
-    })
+    });
 }
 
 // 取得該路線的公車預測時間
 function getBusEstimateTimeData() {
+    let data = { query: `$filter=RouteUID eq '${params.get('RouteUID')}' and Direction eq '${direction.now}'&$orderby=StopSequence`};
     $.ajax({
-        type: 'GET',
-        url: `${estimatedUrl}?$filter=RouteUID eq '${params.get('RouteUID')}' and Direction eq '${direction.now}'&$orderby=StopSequence`,
+        type: 'POST',
+        url: estimatedUrl,
+        data: data,
         dataType: 'json',
         success: function (data) {
             busEstimateTimeData = data;
@@ -59,17 +63,17 @@ function getBusEstimateTimeData() {
 $('#btnGo').click(function () {
     direction.setDirection(direction.go);
     getBusEstimateTimeData();
-})
+});
 
 $('#btnBack').click(function () {
     direction.setDirection(direction.back);
     getBusEstimateTimeData();
-})
+});
 
 // 手動更新公車預測時間
 $('#refresh').click(function () {
     getBusEstimateTimeData();
-})
+});
 
 function showBusEstimateTimeData() {
     let busRouteInfoList = '';
@@ -82,7 +86,7 @@ function showBusEstimateTimeData() {
         else if (time > 0) {
             timeState = `約${time}秒`;
         }
-        else if (time == 0) {
+        else if (time === 0) {
             timeState = `公車進站中`;
         }
         else {

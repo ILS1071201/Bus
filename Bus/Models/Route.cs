@@ -26,40 +26,4 @@ namespace Bus.Models
         public DateTime UpdateTime { get; set; }
         public int VersionID { get; set; }
     }
-
-    public class Routename
-    {
-        public string Zh_tw { get; set; }
-        public string En { get; set; }
-    }
-
-    public class Operator
-    {
-        public string OperatorID { get; set; }
-        public Operatorname OperatorName { get; set; }
-        public string OperatorCode { get; set; }
-        public string OperatorNo { get; set; }
-    }
-
-    public class Operatorname
-    {
-        public string Zh_tw { get; set; }
-        public string En { get; set; }
-    }
-
-    public class Subroute
-    {
-        public string SubRouteUID { get; set; }
-        public string SubRouteID { get; set; }
-        public string[] OperatorIDs { get; set; }
-        public Subroutename SubRouteName { get; set; }
-        public string Headsign { get; set; }
-        public int Direction { get; set; }
-    }
-
-    public class Subroutename
-    {
-        public string Zh_tw { get; set; }
-        public string En { get; set; }
-    }
 }

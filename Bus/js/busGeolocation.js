@@ -1,8 +1,8 @@
 const position = {};
 let map;
-const busStopUrl = 'https://ptx.transportdata.tw/MOTC/v2/Bus/Stop/City/Taichung';
-const estimatedUrl = 'https://ptx.transportdata.tw/MOTC/v2/Bus/EstimatedTimeOfArrival/City/Taichung';
-const routeUrl = 'https://ptx.transportdata.tw/MOTC/v2/Bus/Route/City/Taichung';
+const busStopUrl = './Bus/Stop';
+const estimatedUrl = './Bus/EstimatedTimeOfArrival';
+const routeUrl = './Bus/Route';
 let nearbyBusStopData;
 let busStopEstimateTimeData;
 let routeNameData;
@@ -34,9 +34,11 @@ function getNearbyBusStop() {
     if (position === null) return;
 
     let distance = 1000;
+    let data = { query: `$spatialFilter=nearby(StopPosition,${position.latitude},${position.longitude},${distance})`};
     $.ajax({
-        type: 'GET',
-        url: `${busStopUrl}?$spatialFilter=nearby(StopPosition,${position.latitude},${position.longitude},${distance})`,
+        type: 'POST',
+        url: busStopUrl,
+        data: data,
         dataType: 'json',
         success: function (data) {
             nearbyBusStopData = data;
@@ -50,7 +52,7 @@ function addBusMarker() {
     for (const item of nearbyBusStopData) {
         let marker = new google.maps.Marker({
             position: { lat: item.StopPosition.PositionLat, lng: item.StopPosition.PositionLon },
-            icon: '../img/bus.png',
+            icon: '../Content/Images/bus.png',
             map: map
         });
 
@@ -64,8 +66,8 @@ function addBusMarker() {
             });
             console.log(busStopFilter);
             getBusStopData(busStopFilter);
-            
-        })
+
+        });
     }
 }
 
@@ -83,9 +85,11 @@ function getBusStopData(busStops) {
         }
     }
 
+    let data = { query: `$filter=${queryString}&$orderby=EstimateTime,RouteID,Direction` };
     $.ajax({
-        type: 'GET',
-        url: `${estimatedUrl}?$filter=${queryString}&$orderby=EstimateTime,RouteID,Direction`,
+        type: 'POST',
+        url: estimatedUrl,
+        data: data,
         dataType: 'json',
         success: function (data) {
             console.log(`${estimatedUrl}?$filter=${queryString}&$orderby=EstimateTime,RouteID,Direction`);
@@ -106,16 +110,18 @@ function getRouteNameData(busStopTime) {
         }
     }
 
+    let data = { query: `$filter=${queryString}`};
     $.ajax({
-        type: 'GET',
-        url: `${routeUrl}?$filter=${queryString}`,
+        type: 'POST',
+        url: `routeUrl`,
+        data: data,
         dataType: 'json',
         success: function (data) {
             console.log(data);
             routeNameData = data;
             showBusStopData();
         }
-    })
+    });
 }
 
 function showBusStopData() {
@@ -142,7 +148,7 @@ function showBusStopData() {
         }
 
         temp =
-            `<a class="list-group-item list-group-item-action" href="busRouteInfo.html?RouteUID=${item.RouteUID}">
+            `<a class="list-group-item list-group-item-action" href="./busRouteInfo.html?RouteUID=${item.RouteUID}">
                 <div class="row">
                     <div class="col-10">
                         <h3>${item.RouteName.Zh_tw}</h3>
