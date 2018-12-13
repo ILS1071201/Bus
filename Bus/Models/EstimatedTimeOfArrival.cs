@@ -10,13 +10,13 @@ namespace Bus.Models
         public string PlateNumb { get; set; }
         public string StopUID { get; set; }
         public string StopID { get; set; }
-        public Stopname StopName { get; set; }
+        public StopName StopName { get; set; }
         public string RouteUID { get; set; }
         public string RouteID { get; set; }
-        public Routename RouteName { get; set; }
+        public RouteName RouteName { get; set; }
         public string SubRouteUID { get; set; }
         public string SubRouteID { get; set; }
-        public Subroutename SubRouteName { get; set; }
+        public SubrouteName SubRouteName { get; set; }
         public int Direction { get; set; }
         public int? EstimateTime { get; set; }
         public int StopSequence { get; set; }

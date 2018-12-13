@@ -15,7 +15,7 @@ namespace Bus.Models
         public string ProviderID { get; set; }
         public Subroute[] SubRoutes { get; set; }
         public int BusRouteType { get; set; }
-        public Routename RouteName { get; set; }
+        public RouteName RouteName { get; set; }
         public string DepartureStopNameZh { get; set; }
         public string DepartureStopNameEn { get; set; }
         public string DestinationStopNameZh { get; set; }

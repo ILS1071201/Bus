@@ -15,36 +15,30 @@ namespace Bus.Controllers
     {
         public ActionResult Index(string query)
         {
-            //string xdate = DateTime.Now.ToUniversalTime().ToString("r");
-            //string sAuth = HMAC_SHA1.GetAuth(xdate);
-
-            //List<Route> Data = new List<Route>();
-            ////欲呼叫之API網址(此範例為台鐵車站資料)
-
-            //var APIUrl = $"https://ptx.transportdata.tw/MOTC/v2/Bus/Route/City/Taichung?{query}";
-            //string Result = string.Empty;
-            //using (HttpClient Client = new HttpClient(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip }))
-            //{
-            //    Client.DefaultRequestHeaders.Add("Authorization", sAuth);
-            //    Client.DefaultRequestHeaders.Add("x-date", xdate);
-            //    Result = Client.GetStringAsync(APIUrl).Result;
-            //}
-
-            //Data = JsonConvert.DeserializeObject<List<Route>>(Result);
-            //return Json(Data);
-            //return CallAPIByHMAC();
-            //return View();
             return Redirect("./index.html");
         }
-       
+
+        /// <summary>
+        /// HMAC 取得API
+        /// </summary>
+        /// <returns></returns>
         //private ActionResult CallAPIByHMAC()
         //{
+        //    //申請的APPID
+        //    //（FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF 為 Guest 帳號，以IP作為API呼叫限制，請替換為註冊的APPID & APPKey）
+        //    string APPID = "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF";
+        //    //申請的APPKey
+        //    string APPKey = "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF";
+
+        //    //取得當下UTC時間
         //    string xdate = DateTime.Now.ToUniversalTime().ToString("r");
-        //    string sAuth = HMAC_SHA1.GetAuth(xdate);
+        //    string SignDate = "x-date: " + xdate;
+        //    //取得加密簽章
+        //    string Signature = HMAC_SHA1.Signature(SignDate, APPKey);
+        //    string sAuth = "hmac username=\"" + APPID + "\", algorithm=\"hmac-sha1\", headers=\"x-date\", signature=\"" + Signature + "\"";
 
         //    List<RailStation> Data = new List<RailStation>();
         //    //欲呼叫之API網址(此範例為台鐵車站資料)
-
         //    var APIUrl = "http://ptx.transportdata.tw/MOTC/v2/Rail/TRA/Station?$top=10&$format=JSON";
         //    string Result = string.Empty;
 
@@ -56,7 +50,9 @@ namespace Bus.Controllers
         //    }
 
         //    Data = JsonConvert.DeserializeObject<List<RailStation>>(Result);
-        //    return Json(Data, JsonRequestBehavior.AllowGet);
+        //    ViewBag.ticket = Signature;
+        //    return View(Data);
+
         //}
 
         public ActionResult About()

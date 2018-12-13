@@ -10,8 +10,8 @@ namespace Bus.Models
         public string StopUID { get; set; }
         public string StopID { get; set; }
         public string AuthorityID { get; set; }
-        public Stopname StopName { get; set; }
-        public Stopposition StopPosition { get; set; }
+        public StopName StopName { get; set; }
+        public StopPosition StopPosition { get; set; }
         public string City { get; set; }
         public string CityCode { get; set; }
         public string LocationCityCode { get; set; }
