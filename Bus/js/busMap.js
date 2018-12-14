@@ -1,11 +1,12 @@
-const position = { latitude: 24.215, longitude: 120.614 };
+// Google Map 起始位置
+const position = { lat: 24.215, lng: 120.614 };
 let map;
-const busStopUrl = './Bus/Stop';
-const estimatedUrl = './Bus/EstimatedTimeOfArrival';
-const routeUrl = './Bus/Route';
-let nearbyBusStopData;
-let busStopEstimateTimeData;
-let routeNameData;
+const nearbyStopsUrl = './Bus/NearbyStops';
+const stopsTimeUrl = './Bus/StopsTime';
+let nearbyStopData;
+let selectedBusStopsData;
+let time = 0;
+const refreshTime = 60;
 
 // 獲取目前定位、初始化Google Maps，並獲取附近公車站牌
 // function getBusGeolocation() {
@@ -18,9 +19,10 @@ let routeNameData;
 //     });
 // }
 
+// 初始Google Map並增加手動定位監聽事件
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: position.latitude, lng: position.longitude },
+        center: { lat: position.lat, lng: position.lng },
         zoom: 15
     });
     map.addListener('click', function (e) {
@@ -28,6 +30,7 @@ function initMap() {
     });
 }
 
+// 手動定位事件觸發，移除手動定位事件，並將該定位置中，再透過該定位取得附近站牌
 function getUserGeolocation(latLng, map) {
     let marker = new google.maps.Marker({
         position: latLng,
@@ -36,31 +39,34 @@ function getUserGeolocation(latLng, map) {
     });
     map.panTo(latLng);
     google.maps.event.clearListeners(map, 'click');
-    position.latitude = latLng.lat();
-    position.longitude = latLng.lng();
+    position.lat = latLng.lat();
+    position.lng = latLng.lng();
     getNearbyBusStop();
 }
 
 function getNearbyBusStop() {
-    if (position === null) return;
+    let data = {
+        lat: position.lat,
+        lng: position.lng,
+        distance: 1000
+    };
 
-    let distance = 1000;
-    let data = { query: `$spatialFilter=nearby(StopPosition,${position.latitude},${position.longitude},${distance})` };
     $.ajax({
         type: 'POST',
-        url: busStopUrl,
+        url: nearbyStopsUrl,
         data: data,
         dataType: 'json',
         success: function (data) {
-            nearbyBusStopData = data;
-            console.log(nearbyBusStopData);
+            nearbyStopData = data;
+            console.log(nearbyStopData);
             addBusMarker();
         }
     });
 }
 
+// 在Google Map上添加bus marker
 function addBusMarker() {
-    for (const item of nearbyBusStopData) {
+    for (const item of nearbyStopData) {
         let marker = new google.maps.Marker({
             position: { lat: item.StopPosition.PositionLat, lng: item.StopPosition.PositionLon },
             icon: '../Content/Images/bus.png',
@@ -69,15 +75,21 @@ function addBusMarker() {
 
         marker.addListener('click', function () {
             console.log(item.StopName.Zh_tw);
+            $('#stopName').text(item.StopName.Zh_tw);
             const lat = item.StopPosition.PositionLat;
             const lng = item.StopPosition.PositionLon;
-            let busStopFilter = nearbyBusStopData.filter(function (busStop) {
+
+            map.zoom = 18;
+            map.panTo({ lat: lat, lng: lng });
+
+            let busStopFilter = nearbyStopData.filter(function (busStop) {
                 return busStop.StopPosition.PositionLat === lat
                     && busStop.StopPosition.PositionLon === lng;
             });
             console.log(busStopFilter);
-            getBusStopData(busStopFilter);
+            selectedBusStopsData = busStopFilter;
 
+            getStopsTimeData();
         });
     }
 }
@@ -86,62 +98,52 @@ $('#btnGeolocation').click(function () {
     initMap();
 });
 
-function getBusStopData(busStops) {
-    let queryString = '';
-    for (let index = 0; index < busStops.length; index++) {
-        if (busStops.length === 1 || index === 0) {
-            queryString += `StopUID eq '${busStops[index].StopUID}'`;
-        } else {
-            queryString += ` or StopUID eq '${busStops[index].StopUID}'`;
-        }
+$(setInterval(function () {
+    if (selectedBusStopsData) {
+        time += 1;
+        if (time >= refreshTime) { getStopsTimeData(); }
+        $('#time').text(`於${time}秒前更新`);
     }
+}, 1000));
 
-    let data = { query: `$filter=${queryString}&$orderby=EstimateTime,RouteID,Direction` };
+// 手動更新公車預測時間
+$('#refresh').click(function () {
+    getStopsTimeData();
+});
+
+function getStopsTimeData() {
+    let busStops = [];
+    for (const busStopData of selectedBusStopsData) {
+        busStops.push(busStopData.StopUID);
+    }
+    console.log(busStops);
+
+    let data = {
+        stopUIDs: busStops
+    };
+    console.log(data);
+
     $.ajax({
         type: 'POST',
-        url: estimatedUrl,
-        data: data,
-        dataType: 'json',
-        success: function (data) {
-            console.log(`${estimatedUrl}?$filter=${queryString}&$orderby=EstimateTime,RouteID,Direction`);
-            // console.log(data);
-            busStopEstimateTimeData = data;
-            getRouteNameData(busStopEstimateTimeData);
-        }
-    });
-}
-
-function getRouteNameData(busStopTime) {
-    let queryString = '';
-    for (let index = 0; index < busStopTime.length; index++) {
-        if (busStopTime.length === 1 || index === 0) {
-            queryString += `RouteUID eq '${busStopTime[index].RouteUID}'`;
-        } else {
-            queryString += ` or RouteUID eq '${busStopTime[index].RouteUID}'`;
-        }
-    }
-
-    let data = { query: `$filter=${queryString}` };
-    $.ajax({
-        type: 'POST',
-        url: routeUrl,
+        url: stopsTimeUrl,
         data: data,
         dataType: 'json',
         success: function (data) {
             console.log(data);
-            routeNameData = data;
-            showBusStopData();
+            time = 0;
+            $('#timeBlock').show();
+            showBusStopData(data);
         }
     });
 }
 
-function showBusStopData() {
+function showBusStopData(data) {
     let busStopList = '';
     let busTimeNullOrBelowZero = '';
     let isNullOrBelowZero = false;
     let temp = '';
-    for (const item of busStopEstimateTimeData) {
-        const time = item.EstimateTime;
+    for (const item of data) {
+        const time = item.stopTimeData.EstimateTime;
         let timeState = '';
         if (time >= 60) {
             timeState = `約${time / 60}分鐘`;
@@ -158,12 +160,19 @@ function showBusStopData() {
             isNullOrBelowZero = true;
         }
 
+        let routeDirectionName = '';
+        if (item.stopTimeData.Direction === 0) {
+            routeDirectionName = item.routeData.DestinationStopNameZh;
+        } else {
+            routeDirectionName = item.routeData.DepartureStopNameZh;
+        }
+
         temp =
-            `<a class="list-group-item list-group-item-action" href="./busRouteInfo.html?RouteUID=${item.RouteUID}">
+            `<a class="list-group-item list-group-item-action" href="./busRouteInfo.html?RouteUID=${item.stopTimeData.RouteUID}&Direction=${item.stopTimeData.Direction}">
                 <div class="row">
                     <div class="col-10">
-                        <h3>${item.RouteName.Zh_tw}</h3>
-                        <p>${item.RouteUID} - ${item.Direction}</p>
+                        <h3>${item.stopTimeData.RouteName.Zh_tw}</h3>
+                        <p>往${routeDirectionName}</p>
                     </div>
                     <div class="col">
                         <h4>${timeState}</h4>

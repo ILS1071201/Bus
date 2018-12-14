@@ -170,7 +170,7 @@
     <Content Include="Content\Site.css" />
     <Content Include="Content\Images\bus.png" />
     <Content Include="index.html" />
-    <Content Include="js\busGeolocation.js" />
+    <Content Include="js\busMap.js" />
     <Content Include="js\busRouteInfo.js" />
     <Content Include="js\index.js" />
     <Content Include="Scripts\bootstrap.js" />

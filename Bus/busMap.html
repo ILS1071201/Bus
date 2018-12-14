@@ -16,19 +16,33 @@
         }
     </style>
 
-    <title>Document</title>
+    <title>附近站牌</title>
 </head>
 
 <body>
+    <ul class="nav justify-content-center">
+        <li class="nav-item">
+            <a class="nav-link" href="./index.html">公車路線</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="./busMap.html">附近站牌</a>
+        </li>
+    </ul>
     <div class="container">
+        <h1 style="text-align:center">附近站牌</h1>
         <button type="button" class="btn btn-primary" id="btnGeolocation">定位</button>
         <div id="map"></div>
+        <h2 style="text-align:center" id="stopName"></h2>
+        <div class="d-flex justify-content-end">
+            <h5 class="d-inline" id="time">於0秒前更新</h5>
+            <button type="button" class="btn btn-sm" id="refresh">更新</button>
+        </div>
         <div class="list-group" id="list"></div>
     </div>
 
     <script src="./Scripts/jquery-3.3.1.js"></script>
     <script src="./Scripts/bootstrap.js"></script>
-    <script src="./js/busGeolocation.js"></script>
+    <script src="./js/busMap.js"></script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDAtM83_HNs2MhPvu2YnahlOEzrnntmAJI&callback=initMap"></script>
 </body>
 

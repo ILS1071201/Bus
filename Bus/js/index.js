@@ -1,13 +1,11 @@
-const baseUrl = './Bus/Route';
+const baseUrl = './Bus/Routes';
 let busRouteData;
 
 //取回所有的busRouteData(靜態資料)
 $(function () {
-    let data = { query: '' };
     $.ajax({
         type: 'POST',
         url: baseUrl,
-        data: data,
         dataType: 'json',
         success: function (data) {
             busRouteData = data;

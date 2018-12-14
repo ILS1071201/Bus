@@ -9,12 +9,13 @@ namespace Bus.Services
 {
     public class BusService
     {
+        private PtxService _ptxService = new PtxService();
+
         public List<Route> GetRoutes(string query)
         {
             string apiUrl = $"https://ptx.transportdata.tw/MOTC/v2/Bus/Route/City/Taichung?{query}";
 
-            var ptxService = new PtxService();
-            var data = ptxService.GetJsonData<Route>(apiUrl);
+            var data = _ptxService.GetJsonData<Route>(apiUrl);
 
             return data;
         }
@@ -23,8 +24,7 @@ namespace Bus.Services
         {
             string apiUrl = $"https://ptx.transportdata.tw/MOTC/v2/Bus/EstimatedTimeOfArrival/City/Taichung?{query}";
 
-            var ptxService = new PtxService();
-            var data = ptxService.GetJsonData<EstimatedTimeOfArrival>(apiUrl);
+            var data = _ptxService.GetJsonData<EstimatedTimeOfArrival>(apiUrl);
 
             return data;
         }
@@ -33,8 +33,7 @@ namespace Bus.Services
         {
             string apiUrl = $"https://ptx.transportdata.tw/MOTC/v2/Bus/Stop/City/Taichung?{query}";
 
-            var ptxService = new PtxService();
-            var data = ptxService.GetJsonData<Stop>(apiUrl);
+            var data = _ptxService.GetJsonData<Stop>(apiUrl);
 
             return data;
         }

@@ -8,36 +8,7 @@ namespace Bus.Controllers
 {
     public class BusController : Controller
     {
-
-        // POST: Bus/Route
-        [HttpPost]
-        public ActionResult Route(string query)
-        {
-            BusService busService = new BusService();
-            List<Route> routeData = busService.GetRoutes(query);
-
-            return Json(routeData);
-        }
-
-        // POST: Bus/EstimatedTimeOfArrival
-        [HttpPost]
-        public ActionResult EstimatedTimeOfArrival(string query)
-        {
-            BusService busService = new BusService();
-            List<EstimatedTimeOfArrival> data = busService.GetEstimatedTimeOfArrival(query);
-
-            return Json(data);
-        }
-
-        // POST: Bus/Stop
-        [HttpPost]
-        public ActionResult Stop(string query)
-        {
-            BusService busService = new BusService();
-            List<Stop> data = busService.GetStops(query);
-
-            return Json(data);
-        }
+        private BusService _busService = new BusService();
 
         // POST: Bus/Routes
         /// <summary>
@@ -47,9 +18,7 @@ namespace Bus.Controllers
         [HttpPost]
         public ActionResult Routes()
         {
-            BusService busService = new BusService();
-
-            var routesData = busService.GetRoutes("");
+            var routesData = _busService.GetRoutes("");
 
             return Json(routesData);
         }
@@ -64,13 +33,11 @@ namespace Bus.Controllers
         [HttpPost]
         public ActionResult RouteTime(string routeUID, int direction)
         {
-            BusService busService = new BusService();
-
             string routeQuery = $"$filter=RouteUID eq '{routeUID}'";
-            var routeInfo = busService.GetRoutes(routeQuery);
+            var routeInfo = _busService.GetRoutes(routeQuery);
 
             string routeTimeQuery = $"$filter=RouteUID eq '{routeUID}' and Direction eq '{direction}'&$orderby=StopSequence";
-            var routeTimeData = busService.GetEstimatedTimeOfArrival(routeTimeQuery);
+            var routeTimeData = _busService.GetEstimatedTimeOfArrival(routeTimeQuery);
 
             var routeInfoAndRouteTimeData = new
             {
@@ -92,10 +59,8 @@ namespace Bus.Controllers
         [HttpPost]
         public ActionResult NearbyStops(float lat, float lng, int distance)
         {
-            BusService busService = new BusService();
-
             string nearbyStopsQuery = $"$spatialFilter=nearby(StopPosition,{lat},{lng},{distance})";
-            var nearbyStopsData = busService.GetStops(nearbyStopsQuery);
+            var nearbyStopsData = _busService.GetStops(nearbyStopsQuery);
 
             return Json(nearbyStopsData);
         }
@@ -108,8 +73,6 @@ namespace Bus.Controllers
         /// <returns>Json格式的所有站牌之公車預計到達時間與站牌路線資訊</returns>
         public ActionResult StopsTime(List<string> stopUIDs)
         {
-            BusService busService = new BusService();
-
             // 獲取公車預計到達時間
             var stopUIDsQuery = new List<string>();
             foreach (var stopUID in stopUIDs)
@@ -117,7 +80,7 @@ namespace Bus.Controllers
                 stopUIDsQuery.Add($"StopUID eq '{stopUID}'");
             }
             string stopsTimeQuery = $"$filter={string.Join(" or ", stopUIDsQuery)}&$orderby=EstimateTime,RouteID,Direction";
-            var stopsTimeData = busService.GetEstimatedTimeOfArrival(stopsTimeQuery);
+            var stopsTimeData = _busService.GetEstimatedTimeOfArrival(stopsTimeQuery);
 
             // 獲取路線資訊
             var routeUIDs = stopsTimeData.Select(s => s.RouteUID).Distinct().ToList();
@@ -127,7 +90,7 @@ namespace Bus.Controllers
                 routeUIDsQuery.Add($"RouteUID eq '{routeUID}'");
             }
             var routesQuery = $"$filter={string.Join(" or ", routeUIDsQuery)}";
-            var routesData = busService.GetRoutes(routesQuery);
+            var routesData = _busService.GetRoutes(routesQuery);
 
             // join到達時間與路線資訊
             var stopTimeAndRouteData = from t in stopsTimeData
