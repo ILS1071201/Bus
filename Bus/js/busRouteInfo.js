@@ -67,7 +67,8 @@ function setDirectionButtonAttr() {
     if (direction.now === 0) {
         $('#btnGo').attr('class', 'col-5 btn btn-primary');
         $('#btnBack').attr('class', 'col-5 btn btn-outline-primary');
-    } else if (direction.now === 1) {
+    }
+    if (direction.now === 1) {
         $('#btnGo').attr('class', 'col-5 btn btn-outline-primary');
         $('#btnBack').attr('class', 'col-5 btn btn-primary');
     }

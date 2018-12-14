@@ -44,7 +44,7 @@ $('#btnBusSearch').click(function () {
 
 //搜尋資料
 function searchBusRoute(searchValue) {
-    if (busRouteData === null) return;
+    if (!busRouteData) return;
     let tempData = busRouteData.filter(function (item) {
         return item.SubRoutes[0].SubRouteName.Zh_tw.indexOf(searchValue) >= 0
             || item.SubRoutes[0].Headsign.indexOf(searchValue) >= 0;

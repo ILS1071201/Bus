@@ -1,6 +1,7 @@
 // Google Map 起始位置
 const position = { lat: 24.215, lng: 120.614 };
 let map;
+let infowindow;
 const nearbyStopsUrl = './Bus/NearbyStops';
 const stopsTimeUrl = './Bus/StopsTime';
 let nearbyStopData;
@@ -28,6 +29,9 @@ function initMap() {
     map.addListener('click', function (e) {
         getUserGeolocation(e.latLng, map);
     });
+
+    infowindow = new google.maps.InfoWindow();
+
 }
 
 // 手動定位事件觸發，移除手動定位事件，並將該定位置中，再透過該定位取得附近站牌
@@ -70,6 +74,7 @@ function addBusMarker() {
         let marker = new google.maps.Marker({
             position: { lat: item.StopPosition.PositionLat, lng: item.StopPosition.PositionLon },
             icon: '../Content/Images/bus.png',
+            title: item.StopName.Zh_tw,
             map: map
         });
 
@@ -86,6 +91,11 @@ function addBusMarker() {
                 return busStop.StopPosition.PositionLat === lat
                     && busStop.StopPosition.PositionLon === lng;
             });
+
+            infowindow.close();
+            infowindow.setContent(item.StopName.Zh_tw);
+            infowindow.open(map, marker);
+
             console.log(busStopFilter);
             selectedBusStopsData = busStopFilter;
 
@@ -163,7 +173,8 @@ function showBusStopData(data) {
         let routeDirectionName = '';
         if (item.stopTimeData.Direction === 0) {
             routeDirectionName = item.routeData.DestinationStopNameZh;
-        } else {
+        }
+        if (item.stopTimeData.Direction === 1) {
             routeDirectionName = item.routeData.DepartureStopNameZh;
         }
 
@@ -172,7 +183,7 @@ function showBusStopData(data) {
                 <div class="row">
                     <div class="col-10">
                         <h3>${item.stopTimeData.RouteName.Zh_tw}</h3>
-                        <p>往${routeDirectionName}</p>
+                        <p>往 ${routeDirectionName}</p>
                     </div>
                     <div class="col">
                         <h4>${timeState}</h4>
