@@ -110,8 +110,12 @@ $('#btnGeolocation').click(function () {
 
 $(setInterval(function () {
     if (selectedBusStopsData) {
-        time += 1;
         if (time >= refreshTime) { getStopsTimeData(); }
+        if (time === -1) {
+            $('#time').text('資料更新中...');
+            return;
+        }
+        time += 1;
         $('#time').text(`於${time}秒前更新`);
     }
 }, 1000));
@@ -132,6 +136,9 @@ function getStopsTimeData() {
         stopUIDs: busStops
     };
     console.log(data);
+
+    // 資料更新中
+    time = -1;
 
     $.ajax({
         type: 'POST',

@@ -24,14 +24,22 @@ $(function () {
     getBusEstimateTimeData();
 
     setInterval(function () {
-        time += 1;
         if (time >= refreshTime) { getBusEstimateTimeData(); }
+        if (time === -1) {
+            $('#time').text('資料更新中...');
+            return;
+        }
+        time += 1;
         $('#time').text(`於${time}秒前更新`);
     }, 1000);
 });
 
 // 取得該路線的公車預測時間
 function getBusEstimateTimeData() {
+
+    // 資料更新中
+    time = -1;
+
     let data = {
         routeUID: params.get('RouteUID'),
         direction: direction.now
@@ -90,7 +98,7 @@ function showBusEstimateTimeData(data) {
         else if (time > 0) {
             timeState = `約${time}秒`;
         }
-        else if (time === 0) {
+        else if (time >= 0) {
             timeState = `公車進站中`;
         }
         else {
