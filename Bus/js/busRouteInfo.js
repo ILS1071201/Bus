@@ -98,7 +98,7 @@ function showBusEstimateTimeData(data) {
         else if (time > 0) {
             timeState = `約${time}秒`;
         }
-        else if (time >= 0) {
+        else if (time === 0) {
             timeState = `公車進站中`;
         }
         else {
