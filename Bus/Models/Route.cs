@@ -10,10 +10,10 @@ namespace Bus.Models
         public string RouteUID { get; set; }
         public string RouteID { get; set; }
         public bool HasSubRoutes { get; set; }
-        public Operator[] Operators { get; set; }
+        public List<Operator> Operators { get; set; }
         public string AuthorityID { get; set; }
         public string ProviderID { get; set; }
-        public Subroute[] SubRoutes { get; set; }
+        public List<Subroute> SubRoutes { get; set; }
         public int BusRouteType { get; set; }
         public RouteName RouteName { get; set; }
         public string DepartureStopNameZh { get; set; }

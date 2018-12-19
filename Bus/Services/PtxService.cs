@@ -14,7 +14,7 @@ namespace Bus.Services
         public List<T> GetJsonData<T>(string apiUrl)
         {
             string xdate = DateTime.Now.ToUniversalTime().ToString("r");
-            string sAuth = HMAC_SHA1.GetAuth(xdate);
+            string sAuth = PtxAuth.GetAuth(xdate);
 
             string result = string.Empty;
             using (HttpClient client = new HttpClient(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.GZip }))
